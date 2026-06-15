@@ -3,6 +3,16 @@ const mongodb = require("../data/database");
 const router = express.Router();
 const ObjectId = require("mongodb").ObjectId;
 
+
+/**
+ * @swagger
+ * /courses:
+ *   get:
+ *     summary: Get all courses
+ *     responses:
+ *       200:
+ *         description: List of courses
+ */
 router.get("/", async (req, res) => {
   try {
     const db = mongodb.getDb();
@@ -20,6 +30,39 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /courses:
+ *   post:
+ *     summary: Create a new course
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - courseName
+ *               - instructor
+ *               - semester
+ *               - credits
+ *               - description
+ *             properties:
+ *               courseName:
+ *                 type: string
+ *               instructor:
+ *                 type: string
+ *               semester:
+ *                 type: string
+ *               credits:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Course created
+ */
 router.post("/", async (req, res) => {
   try {
     const {
@@ -67,6 +110,23 @@ router.post("/", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /courses/{id}:
+ *   get:
+ *     summary: Get a single course
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Course found
+ *       404:
+ *         description: Course not found
+ */
 router.get("/:id", async (req, res) => {
   try {
     const db = mongodb.getDb();
@@ -92,6 +152,47 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /courses/{id}:
+ *   put:
+ *     summary: Update a course
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - courseName
+ *               - instructor
+ *               - semester
+ *               - credits
+ *               - description
+ *             properties:
+ *               courseName:
+ *                 type: string
+ *               instructor:
+ *                 type: string
+ *               semester:
+ *                 type: string
+ *               credits:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *     responses:
+ *       204:
+ *         description: Course updated
+ *       404:
+ *         description: Course not found
+ */
 router.put("/:id", async (req, res) => {
   try {
     const db = mongodb.getDb();

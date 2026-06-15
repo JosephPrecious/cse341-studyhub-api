@@ -1,12 +1,15 @@
 const express = require("express");
 const mongodb = require("./data/database");
 const coursesRoutes = require("./routes/courses");
+const swaggerDocs = require("./swagger");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use("/courses", coursesRoutes);
+
+swaggerDocs(app);
 
 app.get("/", (req, res) => {
   res.send("StudyHub API Running");
