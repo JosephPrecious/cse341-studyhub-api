@@ -2,7 +2,16 @@ const express = require("express");
 const mongodb = require("../data/database");
 const router = express.Router();
 const ObjectId = require("mongodb").ObjectId;
+const { ensureAuthenticated } = require("../middleware/auth");
 
+const validateObjectId = (id, res) => {
+  if (!ObjectId.isValid(id)) {
+    res.status(400).json({ message: "Invalid course id" });
+    return null;
+  }
+
+  return new ObjectId(id);
+};
 
 /**
  * @swagger
@@ -63,7 +72,7 @@ router.get("/", async (req, res) => {
  *       201:
  *         description: Course created
  */
-router.post("/", async (req, res) => {
+router.post("/", ensureAuthenticated, async (req, res) => {
   try {
     const {
       courseName,
@@ -131,7 +140,8 @@ router.get("/:id", async (req, res) => {
   try {
     const db = mongodb.getDb();
 
-    const courseId = new ObjectId(req.params.id);
+    const courseId = validateObjectId(req.params.id, res);
+    if (!courseId) return;
 
     const course = await db
       .collection("courses")
@@ -193,11 +203,12 @@ router.get("/:id", async (req, res) => {
  *       404:
  *         description: Course not found
  */
-router.put("/:id", async (req, res) => {
+router.put("/:id", ensureAuthenticated, async (req, res) => {
   try {
     const db = mongodb.getDb();
 
-    const courseId = new ObjectId(req.params.id);
+    const courseId = validateObjectId(req.params.id, res);
+    if (!courseId) return;
 
     const {
       courseName,
@@ -268,11 +279,12 @@ router.put("/:id", async (req, res) => {
  *       404:
  *         description: Not found
  */ 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", ensureAuthenticated, async (req, res) => {
   try {
     const db = mongodb.getDb();
 
-    const courseId = new ObjectId(req.params.id);
+    const courseId = validateObjectId(req.params.id, res);
+    if (!courseId) return;
 
     const response = await db
       .collection("courses")

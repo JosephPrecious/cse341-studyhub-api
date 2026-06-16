@@ -1,8 +1,18 @@
 const express = require("express");
 const mongodb = require("../data/database");
 const ObjectId = require("mongodb").ObjectId;
+const { ensureAuthenticated } = require("../middleware/auth");
 
 const router = express.Router();
+
+const validateObjectId = (id, res) => {
+  if (!ObjectId.isValid(id)) {
+    res.status(400).json({ message: "Invalid assignment id" });
+    return null;
+  }
+
+  return new ObjectId(id);
+};
 
 /**
  * @swagger
@@ -49,7 +59,8 @@ router.get("/:id", async (req, res) => {
   try {
     const db = mongodb.getDb();
 
-    const assignmentId = new ObjectId(req.params.id);
+    const assignmentId = validateObjectId(req.params.id, res);
+    if (!assignmentId) return;
 
     const assignment = await db
       .collection("assignments")
@@ -108,7 +119,7 @@ router.get("/:id", async (req, res) => {
  *       400:
  *         description: Validation error
  */
-router.post("/", async (req, res) => {
+router.post("/", ensureAuthenticated, async (req, res) => {
   try {
     const {
       title,
@@ -184,11 +195,12 @@ router.post("/", async (req, res) => {
  *       404:
  *         description: Not found
  */
-router.put("/:id", async (req, res) => {
+router.put("/:id", ensureAuthenticated, async (req, res) => {
   try {
     const db = mongodb.getDb();
 
-    const assignmentId = new ObjectId(req.params.id);
+    const assignmentId = validateObjectId(req.params.id, res);
+    if (!assignmentId) return;
 
     const {
       title,
@@ -261,11 +273,12 @@ router.put("/:id", async (req, res) => {
  *       404:
  *         description: Not found
  */
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", ensureAuthenticated, async (req, res) => {
   try {
     const db = mongodb.getDb();
 
-    const assignmentId = new ObjectId(req.params.id);
+    const assignmentId = validateObjectId(req.params.id, res);
+    if (!assignmentId) return;
 
     const response = await db
       .collection("assignments")
