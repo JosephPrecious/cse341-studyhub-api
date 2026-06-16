@@ -251,4 +251,49 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+ /**
+ * @swagger
+ * /courses/{id}:
+ *   delete:
+ *     summary: Delete a course
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Deleted successfully
+ *       404:
+ *         description: Not found
+ */ 
+router.delete("/:id", async (req, res) => {
+  try {
+    const db = mongodb.getDb();
+
+    const courseId = new ObjectId(req.params.id);
+
+    const response = await db
+      .collection("courses")
+      .deleteOne({ _id: courseId });
+
+    // if nothing was deleted
+    if (response.deletedCount === 0) {
+      return res.status(404).json({
+        message: "Course not found"
+      });
+    }
+
+    res.status(200).json({
+      message: "Course deleted successfully"
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error"
+    });
+  }
+});
+
 module.exports = router;

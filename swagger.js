@@ -10,13 +10,13 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "http://localhost:3000",
-      description: "HTTP"
+      /*url: "http://localhost:3000",*/
+      description:"HTTP"
     },
     
     {
-      url: "https://cse341-studyhub-api.onrender.com",
-      description: "Render server"
+      /*url: "https://cse341-studyhub-api.onrender.com",*/
+      description:"Render server"
     }
   ]
 };
