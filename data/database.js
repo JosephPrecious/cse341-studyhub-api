@@ -14,7 +14,7 @@ const initDb = (callback) => {
 
   MongoClient.connect(process.env.MONGODB_URL)
     .then((client) => {
-      database = client.db("studyhubAPI");
+      database = client.db("studyhubDB");
       console.log("MongoDB Connected");
       callback(null, database);
     })
