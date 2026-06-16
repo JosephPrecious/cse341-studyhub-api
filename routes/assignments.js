@@ -4,11 +4,6 @@ const ObjectId = require("mongodb").ObjectId;
 
 const router = express.Router();
 
-// TEST ROUTE
-router.get("/", (req, res) => {
-  res.send("Assignments route working");
-});
-
 /**
  * @swagger
  * /assignments:
