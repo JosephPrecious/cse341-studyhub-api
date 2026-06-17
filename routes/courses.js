@@ -17,6 +17,8 @@ const validateObjectId = (id, res) => {
  * @swagger
  * /courses:
  *   get:
+ *   tags:
+ *     - Courses
  *     summary: Get all courses
  *     responses:
  *       200:
@@ -44,6 +46,8 @@ router.get("/", async (req, res) => {
  * @swagger
  * /courses:
  *   post:
+ *   tags:
+ *     - Courses
  *     summary: Create a new course
  *     requestBody:
  *       required: true
@@ -123,6 +127,8 @@ router.post("/", ensureAuthenticated, async (req, res) => {
  * @swagger
  * /courses/{id}:
  *   get:
+ *   tags:
+ *    - Courses
  *     summary: Get a single course
  *     parameters:
  *       - in: path
@@ -167,6 +173,8 @@ router.get("/:id", async (req, res) => {
  * @swagger
  * /courses/{id}:
  *   put:
+ *   tags:
+ *     - Courses
  *     summary: Update a course
  *     parameters:
  *       - in: path
@@ -266,6 +274,8 @@ router.put("/:id", ensureAuthenticated, async (req, res) => {
  * @swagger
  * /courses/{id}:
  *   delete:
+ *    tags:
+ *       - Courses
  *     summary: Delete a course
  *     parameters:
  *       - in: path

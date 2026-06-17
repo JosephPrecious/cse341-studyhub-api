@@ -18,6 +18,8 @@ const validateObjectId = (id, res) => {
  * @swagger
  * /assignments:
  *   get:
+ *    tags:
+ *      - Assignments
  *     summary: Get all assignments
  *     responses:
  *       200:
@@ -42,6 +44,8 @@ router.get("/", async (req, res) => {
  * @swagger
  * /assignments/{id}:
  *   get:
+ *    tags:
+ *      - Assignments
  *     summary: Get one assignment
  *     parameters:
  *       - in: path
@@ -83,6 +87,8 @@ router.get("/:id", async (req, res) => {
  * @swagger
  * /assignments:
  *   post:
+ *     tags:
+ *       - Assignments
  *     summary: Create assignment
  *     requestBody:
  *       required: true
@@ -174,6 +180,8 @@ router.post("/", ensureAuthenticated, async (req, res) => {
  * @swagger
  * /assignments/{id}:
  *   put:
+ *    tags:
+ *      - Assignments
  *     summary: Update assignment
  *     parameters:
  *       - in: path
@@ -260,6 +268,8 @@ router.put("/:id", ensureAuthenticated, async (req, res) => {
  * @swagger
  * /assignments/{id}:
  *   delete:
+ *   tags:
+ *     - Assignments
  *     summary: Delete assignment
  *     parameters:
  *       - in: path

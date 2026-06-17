@@ -32,6 +32,8 @@ const hasRequiredFields = (group) =>
  * @swagger
  * /groups:
  *   get:
+ *    tags:
+ *      - Study Groups
  *     summary: Get all study groups
  *     responses:
  *       200:
@@ -51,6 +53,8 @@ router.get("/", async (req, res) => {
  * @swagger
  * /groups/{id}:
  *   get:
+ *    tags:
+ *      - Study Groups  
  *     summary: Get one study group
  *     parameters:
  *       - in: path
@@ -86,6 +90,8 @@ router.get("/:id", async (req, res) => {
  * @swagger
  * /groups:
  *   post:
+ *    tags:
+ *      - Study Groups
  *     summary: Create a study group
  *     requestBody:
  *       required: true
@@ -135,6 +141,8 @@ router.post("/", ensureAuthenticated, async (req, res) => {
  * @swagger
  * /groups/{id}:
  *   put:
+ *    tags:
+ *      - Study Groups
  *     summary: Update a study group
  *     parameters:
  *       - in: path
@@ -148,9 +156,25 @@ router.post("/", ensureAuthenticated, async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
+ *               - topic
+ *               - meetingTime
+ *               - members
+ *             properties:
+ *               name:
+ *                 type: string
+ *               topic:
+ *                 type: string
+ *               meetingTime:
+ *                 type: string
+ *               members:
+ *                 type: array
+ *                 items:
+ *                   type: string
  *     responses:
  *       204:
- *         description: Study group updated
+ *         description: Study group updated successfully
  */
 router.put("/:id", ensureAuthenticated, async (req, res) => {
   try {
@@ -184,6 +208,8 @@ router.put("/:id", ensureAuthenticated, async (req, res) => {
  * @swagger
  * /groups/{id}:
  *   delete:
+ *    tags:
+ *      - Study Groups
  *     summary: Delete a study group
  *     parameters:
  *       - in: path

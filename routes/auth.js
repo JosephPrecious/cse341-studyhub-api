@@ -88,6 +88,8 @@ const requireGitHubConfig = (req, res, next) => {
  * @swagger
  * /login:
  *   get:
+ *    tags:
+ *      - Authentication
  *     summary: Start GitHub login
  *     responses:
  *       302:
@@ -99,6 +101,8 @@ router.get("/login", requireGitHubConfig, passport.authenticate("github"));
  * @swagger
  * /auth/github:
  *   get:
+ *   tags:
+ *     - Authentication
  *     summary: Start GitHub OAuth
  *     responses:
  *       302:
@@ -110,6 +114,8 @@ router.get("/auth/github", requireGitHubConfig, passport.authenticate("github"))
  * @swagger
  * /auth/github/callback:
  *   get:
+ *   tags:
+ *     - Authentication
  *     summary: GitHub OAuth callback
  *     responses:
  *       302:
@@ -130,6 +136,8 @@ router.get(
  * @swagger
  * /logout:
  *   get:
+ *   tags:
+ *     - Authentication
  *     summary: Log out current user
  *     responses:
  *       200:
@@ -153,6 +161,8 @@ router.get("/logout", (req, res, next) => {
  * @swagger
  * /current:
  *   get:
+ *   tags:
+ *     - Authentication
  *     summary: Get current authenticated user
  *     responses:
  *       200:

@@ -28,6 +28,8 @@ const hasRequiredFields = (user) =>
  * @swagger
  * /users:
  *   get:
+ *     tags:
+ *       - Users
  *     summary: Get all users
  *     responses:
  *       200:
@@ -46,19 +48,39 @@ router.get("/", async (req, res) => {
 /**
  * @swagger
  * /users/{id}:
- *   get:
- *     summary: Get one user
+ *   put:
+ *    tags:
+ *      - Users
+ *     summary: Update a user
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - githubId
+ *               - username
+ *               - email
+ *               - profileImage
+ *             properties:
+ *               githubId:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               profileImage:
+ *                 type: string
  *     responses:
- *       200:
- *         description: User found
- *       404:
- *         description: User not found
+ *       204:
+ *         description: User updated successfully
  */
 router.get("/:id", async (req, res) => {
   try {
@@ -82,6 +104,8 @@ router.get("/:id", async (req, res) => {
  * @swagger
  * /users:
  *   post:
+ *     tags:
+ *       - Users
  *     summary: Create a new user
  *     requestBody:
  *       required: true
@@ -127,6 +151,8 @@ router.post("/", ensureAuthenticated, async (req, res) => {
  * @swagger
  * /users/{id}:
  *   put:
+ *    tags:
+ *      - Users
  *     summary: Update a user
  *     parameters:
  *       - in: path
@@ -174,6 +200,8 @@ router.put("/:id", ensureAuthenticated, async (req, res) => {
  * @swagger
  * /users/{id}:
  *   delete:
+ *     tags:
+ *       - Users    
  *     summary: Delete a user
  *     parameters:
  *       - in: path

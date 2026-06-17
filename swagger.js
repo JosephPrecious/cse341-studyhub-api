@@ -11,16 +11,21 @@ const swaggerDefinition = {
   servers: [
     {
       url: "http://localhost:3000",
-      description:"HTTP"
+      description: "HTTP"
     },
-    
     {
-      url: "https://cse341-studyhub-api.onrender.com",
-      description:"Render server"
+      url: "https://cse341-studyhub-api-o2rw.onrender.com",
+      description: "Render server"
     }
+  ],
+  tags: [
+    { name: "Users", description: "User management endpoints" },
+    { name: "Courses", description: "Course management endpoints" },
+    { name: "Assignments", description: "Assignment management endpoints" },
+    { name: "Groups", description: "Study group endpoints" },
+    { name: "Auth", description: "Authentication endpoints" }
   ]
 };
-
 const options = {
   swaggerDefinition,
   apis: ["./routes/*.js"]
