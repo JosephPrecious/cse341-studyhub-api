@@ -117,7 +117,15 @@ const options = {
 const swaggerSpec = swaggerJsDoc(options);
 
 function swaggerDocs(app) {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      swaggerOptions: {
+        withCredentials: true
+      }
+    })
+  );
 }
 
 module.exports = swaggerDocs;
