@@ -1,312 +1,93 @@
 const express = require("express");
-const mongodb = require("../data/database");
-const ObjectId = require("mongodb").ObjectId;
+const assignmentsController = require("../controllers/assignments");
 const { ensureAuthenticated } = require("../middleware/auth");
 
 const router = express.Router();
 
-const validateObjectId = (id, res) => {
-  if (!ObjectId.isValid(id)) {
-    res.status(400).json({ message: "Invalid assignment id" });
-    return null;
-  }
-
-  return new ObjectId(id);
-};
+router.use(ensureAuthenticated);
 
 /**
  * @swagger
  * /assignments:
  *   get:
- *    tags:
- *      - Assignments
+ *     tags:
+ *       - Assignments
  *     summary: Get all assignments
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
- *         description: Success
- */
-router.get("/", async (req, res) => {
-  try {
-    const db = mongodb.getDb();
-
-    const assignments = await db
-      .collection("assignments")
-      .find()
-      .toArray();
-
-    res.status(200).json(assignments);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-/**
- * @swagger
- * /assignments/{id}:
- *   get:
- *    tags:
- *      - Assignments
- *     summary: Get one assignment
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Success
- *       404:
- *         description: Not found
- */
-router.get("/:id", async (req, res) => {
-  try {
-    const db = mongodb.getDb();
-
-    const assignmentId = validateObjectId(req.params.id, res);
-    if (!assignmentId) return;
-
-    const assignment = await db
-      .collection("assignments")
-      .findOne({ _id: assignmentId });
-
-    if (!assignment) {
-      return res.status(404).json({
-        message: "Assignment not found"
-      });
-    }
-
-    res.status(200).json(assignment);
-
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-/**
- * @swagger
- * /assignments:
+ *         description: List of assignments
  *   post:
  *     tags:
  *       - Assignments
- *     summary: Create assignment
+ *     summary: Create an assignment
+ *     security:
+ *       - sessionAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - title
- *               - dueDate
- *               - courseId
- *               - status
- *               - priority
- *               - submissionLink
- *               - notes
- *             properties:
- *               title:
- *                 type: string
- *               dueDate:
- *                 type: string
- *               courseId:
- *                 type: string
- *               status:
- *                 type: string
- *               priority:
- *                 type: string
- *               submissionLink:
- *                 type: string
- *               notes:
- *                 type: string
+ *             $ref: '#/components/schemas/AssignmentInput'
  *     responses:
  *       201:
- *         description: Created
- *       400:
- *         description: Validation error
+ *         description: Assignment created
  */
-router.post("/", ensureAuthenticated, async (req, res) => {
-  try {
-    const {
-      title,
-      dueDate,
-      courseId,
-      status,
-      priority,
-      submissionLink,
-      notes
-    } = req.body;
-
-    if (
-      !title ||
-      !dueDate ||
-      !courseId ||
-      !status ||
-      !priority ||
-      !submissionLink ||
-      !notes
-    ) {
-      return res.status(400).json({
-        message: "All fields are required"
-      });
-    }
-
-    const db = mongodb.getDb();
-
-    const assignment = {
-      title,
-      dueDate,
-      courseId,
-      status,
-      priority,
-      submissionLink,
-      notes
-    };
-
-    const response = await db
-      .collection("assignments")
-      .insertOne(assignment);
-
-    res.status(201).json({
-      id: response.insertedId
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+router
+  .route("/")
+  .get(assignmentsController.getAll)
+  .post(assignmentsController.create);
 
 /**
  * @swagger
  * /assignments/{id}:
- *   put:
- *    tags:
- *      - Assignments
- *     summary: Update assignment
+ *   get:
+ *     tags:
+ *       - Assignments
+ *     summary: Get one assignment
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
+ *       - $ref: '#/components/parameters/Id'
+ *     responses:
+ *       200:
+ *         description: Assignment found
+ *       404:
+ *         description: Assignment not found
+ *   put:
+ *     tags:
+ *       - Assignments
+ *     summary: Update an assignment
+ *     security:
+ *       - sessionAuth: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/Id'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
+ *             $ref: '#/components/schemas/AssignmentInput'
  *     responses:
  *       204:
- *         description: Updated
- *       400:
- *         description: Validation error
- *       404:
- *         description: Not found
- */
-router.put("/:id", ensureAuthenticated, async (req, res) => {
-  try {
-    const db = mongodb.getDb();
-
-    const assignmentId = validateObjectId(req.params.id, res);
-    if (!assignmentId) return;
-
-    const {
-      title,
-      dueDate,
-      courseId,
-      status,
-      priority,
-      submissionLink,
-      notes
-    } = req.body;
-
-    if (
-      !title ||
-      !dueDate ||
-      !courseId ||
-      !status ||
-      !priority ||
-      !submissionLink ||
-      !notes
-    ) {
-      return res.status(400).json({
-        message: "All fields are required"
-      });
-    }
-
-    const updatedAssignment = {
-      title,
-      dueDate,
-      courseId,
-      status,
-      priority,
-      submissionLink,
-      notes
-    };
-
-    const response = await db
-      .collection("assignments")
-      .replaceOne(
-        { _id: assignmentId },
-        updatedAssignment
-      );
-
-    if (response.matchedCount === 0) {
-      return res.status(404).json({
-        message: "Assignment not found"
-      });
-    }
-
-    res.status(204).send();
-
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-/**
- * @swagger
- * /assignments/{id}:
+ *         description: Assignment updated
  *   delete:
- *   tags:
- *     - Assignments
- *     summary: Delete assignment
+ *     tags:
+ *       - Assignments
+ *     summary: Delete an assignment
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
+ *       - $ref: '#/components/parameters/Id'
  *     responses:
  *       200:
- *         description: Deleted
- *       404:
- *         description: Not found
+ *         description: Assignment deleted
  */
-router.delete("/:id", ensureAuthenticated, async (req, res) => {
-  try {
-    const db = mongodb.getDb();
-
-    const assignmentId = validateObjectId(req.params.id, res);
-    if (!assignmentId) return;
-
-    const response = await db
-      .collection("assignments")
-      .deleteOne({ _id: assignmentId });
-
-    if (response.deletedCount === 0) {
-      return res.status(404).json({
-        message: "Assignment not found"
-      });
-    }
-
-    res.status(200).json({
-      message: "Assignment deleted successfully"
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+router
+  .route("/:id")
+  .get(assignmentsController.getById)
+  .put(assignmentsController.update)
+  .delete(assignmentsController.remove);
 
 module.exports = router;

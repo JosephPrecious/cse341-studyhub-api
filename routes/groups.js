@@ -1,244 +1,90 @@
 const express = require("express");
-const mongodb = require("../data/database");
-const ObjectId = require("mongodb").ObjectId;
+const groupsController = require("../controllers/groups");
 const { ensureAuthenticated } = require("../middleware/auth");
 
 const router = express.Router();
 
-const validateObjectId = (id, res) => {
-  if (!ObjectId.isValid(id)) {
-    res.status(400).json({ message: "Invalid group id" });
-    return null;
-  }
-
-  return new ObjectId(id);
-};
-
-const buildGroup = (body) => ({
-  name: body.name,
-  topic: body.topic,
-  meetingTime: body.meetingTime,
-  members: body.members
-});
-
-const hasRequiredFields = (group) =>
-  group.name &&
-  group.topic &&
-  group.meetingTime &&
-  Array.isArray(group.members) &&
-  group.members.length > 0;
+router.use(ensureAuthenticated);
 
 /**
  * @swagger
  * /groups:
  *   get:
- *    tags:
- *      - Study Groups
+ *     tags:
+ *       - Study Groups
  *     summary: Get all study groups
+ *     security:
+ *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: List of study groups
+ *   post:
+ *     tags:
+ *       - Study Groups
+ *     summary: Create a study group
+ *     security:
+ *       - sessionAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/StudyGroupInput'
+ *     responses:
+ *       201:
+ *         description: Study group created
  */
-router.get("/", async (req, res) => {
-  try {
-    const db = mongodb.getDb();
-    const groups = await db.collection("studygroups").find().toArray();
-    res.status(200).json(groups);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+router.route("/").get(groupsController.getAll).post(groupsController.create);
 
 /**
  * @swagger
  * /groups/{id}:
  *   get:
- *    tags:
- *      - Study Groups  
+ *     tags:
+ *       - Study Groups
  *     summary: Get one study group
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
+ *       - $ref: '#/components/parameters/Id'
  *     responses:
  *       200:
  *         description: Study group found
  *       404:
  *         description: Study group not found
- */
-router.get("/:id", async (req, res) => {
-  try {
-    const groupId = validateObjectId(req.params.id, res);
-    if (!groupId) return;
-
-    const db = mongodb.getDb();
-    const group = await db.collection("studygroups").findOne({ _id: groupId });
-
-    if (!group) {
-      return res.status(404).json({ message: "Study group not found" });
-    }
-
-    res.status(200).json(group);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-/**
- * @swagger
- * /groups:
- *   post:
- *    tags:
- *      - Study Groups
- *     summary: Create a study group
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - topic
- *               - meetingTime
- *               - members
- *             properties:
- *               name:
- *                 type: string
- *               topic:
- *                 type: string
- *               meetingTime:
- *                 type: string
- *               members:
- *                 type: array
- *                 items:
- *                   type: string
- *     responses:
- *       201:
- *         description: Study group created
- */
-router.post("/", ensureAuthenticated, async (req, res) => {
-  try {
-    const group = buildGroup(req.body);
-
-    if (!hasRequiredFields(group)) {
-      return res.status(400).json({
-        message: "Name, topic, meetingTime, and at least one member are required"
-      });
-    }
-
-    const db = mongodb.getDb();
-    const response = await db.collection("studygroups").insertOne(group);
-    res.status(201).json({ id: response.insertedId });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-/**
- * @swagger
- * /groups/{id}:
  *   put:
- *    tags:
- *      - Study Groups
+ *     tags:
+ *       - Study Groups
  *     summary: Update a study group
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
+ *       - $ref: '#/components/parameters/Id'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - name
- *               - topic
- *               - meetingTime
- *               - members
- *             properties:
- *               name:
- *                 type: string
- *               topic:
- *                 type: string
- *               meetingTime:
- *                 type: string
- *               members:
- *                 type: array
- *                 items:
- *                   type: string
+ *             $ref: '#/components/schemas/StudyGroupInput'
  *     responses:
  *       204:
- *         description: Study group updated successfully
- */
-router.put("/:id", ensureAuthenticated, async (req, res) => {
-  try {
-    const groupId = validateObjectId(req.params.id, res);
-    if (!groupId) return;
-
-    const group = buildGroup(req.body);
-
-    if (!hasRequiredFields(group)) {
-      return res.status(400).json({
-        message: "Name, topic, meetingTime, and at least one member are required"
-      });
-    }
-
-    const db = mongodb.getDb();
-    const response = await db
-      .collection("studygroups")
-      .replaceOne({ _id: groupId }, group);
-
-    if (response.matchedCount === 0) {
-      return res.status(404).json({ message: "Study group not found" });
-    }
-
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-/**
- * @swagger
- * /groups/{id}:
+ *         description: Study group updated
  *   delete:
- *    tags:
- *      - Study Groups
+ *     tags:
+ *       - Study Groups
  *     summary: Delete a study group
+ *     security:
+ *       - sessionAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
+ *       - $ref: '#/components/parameters/Id'
  *     responses:
  *       200:
- *         description: Deleted
+ *         description: Study group deleted
  */
-router.delete("/:id", ensureAuthenticated, async (req, res) => {
-  try {
-    const groupId = validateObjectId(req.params.id, res);
-    if (!groupId) return;
-
-    const db = mongodb.getDb();
-    const response = await db
-      .collection("studygroups")
-      .deleteOne({ _id: groupId });
-
-    if (response.deletedCount === 0) {
-      return res.status(404).json({ message: "Study group not found" });
-    }
-
-    res.status(200).json({ message: "Study group deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+router
+  .route("/:id")
+  .get(groupsController.getById)
+  .put(groupsController.update)
+  .delete(groupsController.remove);
 
 module.exports = router;
