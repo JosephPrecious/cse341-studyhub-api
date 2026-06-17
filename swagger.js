@@ -17,12 +17,8 @@ const swaggerDefinition = {
   ],
   servers: [
     {
-      url: "http://localhost:3000",
-      description: "Local server"
-    },
-    {
-      url: "https://cse341-studyhub-api-o2rw.onrender.com",
-      description: "Render server"
+      url: "/",
+      description: "Current server"
     }
   ],
   components: {
