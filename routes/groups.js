@@ -4,8 +4,6 @@ const { ensureAuthenticated } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.use(ensureAuthenticated);
-
 /**
  * @swagger
  * /groups:
@@ -13,8 +11,6 @@ router.use(ensureAuthenticated);
  *     tags:
  *       - Study Groups
  *     summary: Get all study groups
- *     security:
- *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: List of study groups
@@ -34,7 +30,10 @@ router.use(ensureAuthenticated);
  *       201:
  *         description: Study group created
  */
-router.route("/").get(groupsController.getAll).post(groupsController.create);
+router
+  .route("/")
+  .get(groupsController.getAll)
+  .post(ensureAuthenticated, groupsController.create);
 
 /**
  * @swagger
@@ -43,8 +42,6 @@ router.route("/").get(groupsController.getAll).post(groupsController.create);
  *     tags:
  *       - Study Groups
  *     summary: Get one study group
- *     security:
- *       - sessionAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/Id'
  *     responses:
@@ -84,7 +81,7 @@ router.route("/").get(groupsController.getAll).post(groupsController.create);
 router
   .route("/:id")
   .get(groupsController.getById)
-  .put(groupsController.update)
-  .delete(groupsController.remove);
+  .put(ensureAuthenticated, groupsController.update)
+  .delete(ensureAuthenticated, groupsController.remove);
 
 module.exports = router;

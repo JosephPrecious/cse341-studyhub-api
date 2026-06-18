@@ -4,8 +4,6 @@ const { ensureAuthenticated } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.use(ensureAuthenticated);
-
 /**
  * @swagger
  * /users:
@@ -13,8 +11,6 @@ router.use(ensureAuthenticated);
  *     tags:
  *       - Users
  *     summary: Get all users
- *     security:
- *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: List of users
@@ -34,7 +30,10 @@ router.use(ensureAuthenticated);
  *       201:
  *         description: User created
  */
-router.route("/").get(usersController.getAll).post(usersController.create);
+router
+  .route("/")
+  .get(usersController.getAll)
+  .post(ensureAuthenticated, usersController.create);
 
 /**
  * @swagger
@@ -43,8 +42,6 @@ router.route("/").get(usersController.getAll).post(usersController.create);
  *     tags:
  *       - Users
  *     summary: Get one user
- *     security:
- *       - sessionAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/Id'
  *     responses:
@@ -84,7 +81,7 @@ router.route("/").get(usersController.getAll).post(usersController.create);
 router
   .route("/:id")
   .get(usersController.getById)
-  .put(usersController.update)
-  .delete(usersController.remove);
+  .put(ensureAuthenticated, usersController.update)
+  .delete(ensureAuthenticated, usersController.remove);
 
 module.exports = router;

@@ -4,8 +4,6 @@ const { ensureAuthenticated } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.use(ensureAuthenticated);
-
 /**
  * @swagger
  * /assignments:
@@ -13,8 +11,6 @@ router.use(ensureAuthenticated);
  *     tags:
  *       - Assignments
  *     summary: Get all assignments
- *     security:
- *       - sessionAuth: []
  *     responses:
  *       200:
  *         description: List of assignments
@@ -37,7 +33,7 @@ router.use(ensureAuthenticated);
 router
   .route("/")
   .get(assignmentsController.getAll)
-  .post(assignmentsController.create);
+  .post(ensureAuthenticated, assignmentsController.create);
 
 /**
  * @swagger
@@ -46,8 +42,6 @@ router
  *     tags:
  *       - Assignments
  *     summary: Get one assignment
- *     security:
- *       - sessionAuth: []
  *     parameters:
  *       - $ref: '#/components/parameters/Id'
  *     responses:
@@ -87,7 +81,7 @@ router
 router
   .route("/:id")
   .get(assignmentsController.getById)
-  .put(assignmentsController.update)
-  .delete(assignmentsController.remove);
+  .put(ensureAuthenticated, assignmentsController.update)
+  .delete(ensureAuthenticated, assignmentsController.remove);
 
 module.exports = router;
