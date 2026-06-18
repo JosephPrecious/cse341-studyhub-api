@@ -1,7 +1,7 @@
 const mongodb = require("mongodb");
 const dotenv = require("dotenv");
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const MongoClient = mongodb.MongoClient;
 
@@ -28,7 +28,12 @@ const getDb = () => {
   return database;
 };
 
+const setDb = (db) => {
+  database = db;
+};
+
 module.exports = {
   initDb,
-  getDb
+  getDb,
+  setDb
 };
